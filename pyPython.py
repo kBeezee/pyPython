@@ -390,5 +390,4 @@ while not libtcod.console_is_window_closed():
     print 'Quit'
     break
 
-  print 'test git'
   #print 'End of Game Loop'
