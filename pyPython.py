@@ -52,7 +52,7 @@ class Object:
 	      if map[rany][ranx].blocked == False:
 		break
 	  
-	    eatIt = Item(ranx, rany, '$', 'food', libtcod.yellow)
+	    eatIt = Item(ranx, rany, 'K', 'food', libtcod.yellow)
 	    food = [eatIt]
 	    eatIt.draw
 	    
@@ -243,8 +243,6 @@ def player_move_or_eat(dx, dy):
     x = player.x + dx
     y = player.y + dy
     
-    print len(map), len(map[y])
-    #51, 76
     if x > SCREEN_WIDTH -1:
       player.x = 0
     if x <= 0:
@@ -291,7 +289,7 @@ def playerLost():
 # Initialization & Main Loop
 #############################################
  
-libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
+libtcod.console_set_custom_font('arial12x12.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, 'python/libtcod tutorial', False)
 libtcod.sys_set_fps(LIMIT_FPS)
 con = libtcod.console_new(SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -327,7 +325,7 @@ while True:
   if map[rany][ranx].blocked == False:
     break
   
-eatIt = Item(ranx, rany, '$', 'food', libtcod.yellow)
+eatIt = Item(ranx, rany, 'K', 'food', libtcod.yellow)
 food = [eatIt]
 eatIt.draw
 
@@ -377,7 +375,7 @@ while not libtcod.console_is_window_closed():
     ranx = libtcod.random_get_int(0, 5, SCREEN_WIDTH - 20)
     rany = libtcod.random_get_int(0, 5, SCREEN_HEIGHT - 20)
 
-    eatIt = Item(ranx, rany, '$', 'food', libtcod.yellow)
+    eatIt = Item(ranx, rany, 'K', 'food', libtcod.yellow)
     food = [eatIt]
     eatIt.draw
 
