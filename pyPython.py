@@ -1,4 +1,5 @@
 import libtcodpy as libtcod
+
 #init globals
 #actual size of the window
 SCREEN_WIDTH = 75
@@ -36,7 +37,7 @@ class snake_parts:
 
     def move(self, dirX, dirY):
         global gamemap
-        global mySnakeLength, status
+        global status
 
         #check for new game
         if oldX == 0 and oldY == 0:
@@ -44,6 +45,16 @@ class snake_parts:
 
         self.x += dirX
         self.y += dirY
+
+        #CHECK FOR SCREEN WRAP
+        if self.x >= SCREEN_WIDTH:
+            self.x = 0
+        elif self.y >= SCREEN_HEIGHT:
+            self.y = 0
+        elif self.x < 0:
+            self.x = SCREEN_WIDTH-1
+        elif self.y < 0:
+            self.y = SCREEN_HEIGHT-1
 
         #eat food
         for idx, obj in enumerate(food):
@@ -62,6 +73,7 @@ class snake_parts:
                 food.append(obj)
                 newBody = snake_parts(self.x - dirX, self.y - dirY, '#', 'body', libtcod.white, True)
                 snake.insert(1, newBody)
+                define_map((len(snake) - initSnakeLen - 1) / 10)
 
         #collision check: Walls.
         if gamemap[self.y][self.x].blocked:
@@ -105,12 +117,47 @@ class mob:
 
 
 #--------functions
-def make_map():
-    global gamemap
-    #blank slate map.
+def define_map(level=0):
+#this is ugly, I want to put all of the below in its own file
+#when the time comes.
+#and switch its format to use this:
+#http://bytebaker.com/2008/11/03/switch-case-statement-`in-python/
+
     for x in range(MAP_HEIGHT):
         for y in range(MAP_WIDTH):
             gamemap[x][y] = map_tile(False)
+
+    if level == 1:
+        for x in range(MAP_HEIGHT):
+            gamemap[x][0] = map_tile(True)
+            gamemap[x][MAP_WIDTH-1] = map_tile(True)
+        for y in range(MAP_WIDTH):
+            gamemap[0][y] = map_tile(True)
+            gamemap[MAP_HEIGHT-1][y] = map_tile(True)
+
+    elif level == 2:
+        for x in range(MAP_HEIGHT):
+            if x < MAP_HEIGHT - 7 and x > 7:
+                gamemap[x][MAP_WIDTH / 3] = map_tile(True)
+                gamemap[x][MAP_WIDTH - (MAP_WIDTH / 3)] = map_tile(True)
+
+    elif level == 3:
+        for x in range(MAP_HEIGHT):
+            gamemap[x][0] = map_tile(True)
+            gamemap[x][MAP_WIDTH-1] = map_tile(True)
+        for y in range(MAP_WIDTH):
+            gamemap[0][y] = map_tile(True)
+            gamemap[MAP_HEIGHT-1][y] = map_tile(True)
+        for x in range(MAP_HEIGHT):
+            if x < MAP_HEIGHT - 7 and x > 7:
+                gamemap[x][MAP_WIDTH / 3] = map_tile(True)
+                gamemap[x][MAP_WIDTH - MAP_WIDTH / 3] = map_tile(True)
+
+    elif level == 4:
+        for x in range(MAP_HEIGHT):
+            gamemap[x][MAP_WIDTH / 2] = map_tile(True)
+        for y in range(MAP_WIDTH):
+            gamemap[MAP_HEIGHT / 2][y] = map_tile(True)
 
 
 def handle_keys():
@@ -155,7 +202,6 @@ def handle_keys():
     else:
         if status != 'dead':
             status = player_move_or_eat(oldX, oldY)
-
     return status
 
 
@@ -185,6 +231,7 @@ def restart_game():
     obj = mob(40, 40, 'K', food, libtcod.dark_yellow)
     food.append(obj)
 
+    define_map()
     status = 'newgame'
     oldX = 0
     oldY = 0
@@ -192,7 +239,7 @@ def restart_game():
 def render_main():
     for x in range(MAP_WIDTH):
         for y in range(MAP_HEIGHT):
-            if gamemap[y][x].blocked == False:
+            if not gamemap[y][x].blocked:
                 libtcod.console_set_char_background(con, x, y, color_dark_ground, libtcod.BKGND_SET)
             else:
                 libtcod.console_set_char_background(con, x, y, color_dark_wall, libtcod.BKGND_SET)
@@ -241,7 +288,7 @@ libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, 'python/libtcod tutorial'
 libtcod.sys_set_fps(LIMIT_FPS)
 con = libtcod.console_new(SCREEN_WIDTH, SCREEN_HEIGHT)
 
-make_map()
+define_map()
 
 while True:
     startX = libtcod.random_get_int(0, 5, SCREEN_WIDTH - 5)
