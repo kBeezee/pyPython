@@ -69,7 +69,7 @@ class snake_parts:
                     if not gamemap[yFood][xFood].blocked:
                         break
 
-                obj = mob(xFood, yFood, 'K', 'food', libtcod.dark_yellow)
+                obj = mob(xFood, yFood, '%', 'food', libtcod.dark_yellow)
                 food.append(obj)
                 newBody = snake_parts(self.x - dirX, self.y - dirY, '#', 'body', libtcod.white, True)
                 snake.insert(1, newBody)
@@ -137,7 +137,7 @@ def define_map(level=0):
 
     elif level == 2:
         for x in range(MAP_HEIGHT):
-            if x < MAP_HEIGHT - 7 and x > 7:
+            if x < MAP_HEIGHT - 7 > 7:
                 gamemap[x][MAP_WIDTH / 3] = map_tile(True)
                 gamemap[x][MAP_WIDTH - (MAP_WIDTH / 3)] = map_tile(True)
 
@@ -149,7 +149,7 @@ def define_map(level=0):
             gamemap[0][y] = map_tile(True)
             gamemap[MAP_HEIGHT-1][y] = map_tile(True)
         for x in range(MAP_HEIGHT):
-            if x < MAP_HEIGHT - 7 and x > 7:
+            if x < MAP_HEIGHT - 7 > 7:
                 gamemap[x][MAP_WIDTH / 3] = map_tile(True)
                 gamemap[x][MAP_WIDTH - MAP_WIDTH / 3] = map_tile(True)
 
@@ -158,6 +158,47 @@ def define_map(level=0):
             gamemap[x][MAP_WIDTH / 2] = map_tile(True)
         for y in range(MAP_WIDTH):
             gamemap[MAP_HEIGHT / 2][y] = map_tile(True)
+
+    elif level == 5:
+        for num in range(1, 10):
+            #top left
+            gamemap[num][0] = map_tile(True)
+            gamemap[0][num] = map_tile(True)
+            #bottom left
+            gamemap[MAP_HEIGHT-1][num] = map_tile(True)
+            gamemap[MAP_HEIGHT-num-1][0] = map_tile(True)
+            #top right
+            gamemap[num][MAP_WIDTH-1] = map_tile(True)
+            gamemap[0][MAP_WIDTH-num-1] = map_tile(True)
+            #bottom left
+            gamemap[MAP_HEIGHT-1][MAP_WIDTH-num-1] = map_tile(True)
+            gamemap[MAP_HEIGHT-num-1][MAP_WIDTH-1] = map_tile(True)
+
+    elif level == 6:
+        for num in range(0, MAP_WIDTH-1):
+            gamemap[MAP_HEIGHT-num-1][MAP_WIDTH-1-num] = map_tile(True)
+
+    elif level == 7:
+        for num in range(0, (MAP_HEIGHT/2)-5):
+            #right side
+            gamemap[0+num][MAP_WIDTH-1-num] = map_tile(True)
+            gamemap[MAP_HEIGHT-1-num][MAP_WIDTH-1-num] = map_tile(True)
+            #left side
+            gamemap[0+num][0+num] = map_tile(True)
+            gamemap[MAP_HEIGHT-1-num][0+num] = map_tile(True)
+
+    elif level == 8:
+        for num in range(0, (MAP_HEIGHT/2)-5):
+            #right side
+            gamemap[0+num][MAP_WIDTH-1-num] = map_tile(True)
+            gamemap[MAP_HEIGHT-1-num][MAP_WIDTH-1-num] = map_tile(True)
+            #left side
+            gamemap[0+num][0+num] = map_tile(True)
+            gamemap[MAP_HEIGHT-1-num][0+num] = map_tile(True)
+        for x in range(MAP_HEIGHT):
+            if x < MAP_HEIGHT - 7 > 7:
+                gamemap[x][MAP_WIDTH / 3 +4] = map_tile(True)
+                gamemap[x][MAP_WIDTH - (MAP_WIDTH / 3 +4 )] = map_tile(True)
 
 
 def handle_keys():
@@ -168,7 +209,6 @@ def handle_keys():
         libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
     elif key.vk == libtcod.KEY_ESCAPE:
         return 'exit'
-
     elif libtcod.console_is_key_pressed(libtcod.KEY_UP) and status != 'dead':
         if oldX == 0 and oldY == 1:
             status = player_move_or_eat(0,1)
@@ -199,6 +239,9 @@ def handle_keys():
             oldY = 0
     elif libtcod.console_is_key_pressed(libtcod.KEY_SPACE) and status == 'dead':
         status = 'restart'
+    elif libtcod.console_is_key_pressed(libtcod.KEY_KPADD) and status == 'newgame':
+        obj = snake_parts(snake[0].x, snake[0].y, '#', 'body', libtcod.white, True)
+        snake.append(obj)
     else:
         if status != 'dead':
             status = player_move_or_eat(oldX, oldY)
@@ -228,7 +271,7 @@ def restart_game():
         snake.append(obj)
 
     food = []
-    obj = mob(40, 40, 'K', food, libtcod.dark_yellow)
+    obj = mob(40, 40, '%', food, libtcod.dark_yellow)
     food.append(obj)
 
     define_map()
@@ -236,7 +279,10 @@ def restart_game():
     oldX = 0
     oldY = 0
 
+
 def render_main():
+    render_hud()
+
     for x in range(MAP_WIDTH):
         for y in range(MAP_HEIGHT):
             if not gamemap[y][x].blocked:
@@ -251,7 +297,6 @@ def render_main():
     for obj in reversed(snake):
         obj.draw()
 
-    render_hud()
     libtcod.console_blit(con, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0)
 
 
@@ -284,29 +329,27 @@ def render_death_screen():
 
 #########Initiallization for game.
 libtcod.console_set_custom_font('arial12x12.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
-libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, 'python/libtcod tutorial', False)
+libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, 'Learning Python Syntax', False)
 libtcod.sys_set_fps(LIMIT_FPS)
 con = libtcod.console_new(SCREEN_WIDTH, SCREEN_HEIGHT)
 
 define_map()
-
+#get cords that are not blocked
 while True:
     startX = libtcod.random_get_int(0, 5, SCREEN_WIDTH - 5)
     startY = libtcod.random_get_int(0, 5, SCREEN_HEIGHT - 5)
     if not gamemap[startY][startX].blocked:
         break
-
 #make the snake
 snake = []
 obj = snake_parts(startX, startY, '@', 'head', libtcod.white, True)
 snake.append(obj)
-
 for i in range(initSnakeLen):
     obj = snake_parts(startX, startY, '#', 'body', libtcod.white, True)
     snake.append(obj)
 
 food = []
-obj = mob(40, 40, 'K', food, libtcod.dark_yellow)
+obj = mob(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, '%', food, libtcod.dark_yellow)
 food.append(obj)
 
 status = 'newgame'
