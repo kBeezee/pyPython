@@ -1,4 +1,3 @@
 pyPython
 ========
-
-Old School Snake using libtcod
+Learning Python (and GitHub) by making a Snake game using 'libtcod'.
