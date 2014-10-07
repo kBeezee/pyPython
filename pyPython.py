@@ -127,39 +127,8 @@ def define_map(level=0):
         for y in range(MAP_WIDTH):
             gamemap[x][y] = map_tile(False)
 
+#just the corners
     if level == 1:
-        for x in range(MAP_HEIGHT):
-            gamemap[x][0] = map_tile(True)
-            gamemap[x][MAP_WIDTH-1] = map_tile(True)
-        for y in range(MAP_WIDTH):
-            gamemap[0][y] = map_tile(True)
-            gamemap[MAP_HEIGHT-1][y] = map_tile(True)
-
-    elif level == 2:
-        for x in range(MAP_HEIGHT):
-            if x < MAP_HEIGHT - 7 > 7:
-                gamemap[x][MAP_WIDTH / 3] = map_tile(True)
-                gamemap[x][MAP_WIDTH - (MAP_WIDTH / 3)] = map_tile(True)
-
-    elif level == 3:
-        for x in range(MAP_HEIGHT):
-            gamemap[x][0] = map_tile(True)
-            gamemap[x][MAP_WIDTH-1] = map_tile(True)
-        for y in range(MAP_WIDTH):
-            gamemap[0][y] = map_tile(True)
-            gamemap[MAP_HEIGHT-1][y] = map_tile(True)
-        for x in range(MAP_HEIGHT):
-            if x < MAP_HEIGHT - 7 > 7:
-                gamemap[x][MAP_WIDTH / 3] = map_tile(True)
-                gamemap[x][MAP_WIDTH - MAP_WIDTH / 3] = map_tile(True)
-
-    elif level == 4:
-        for x in range(MAP_HEIGHT):
-            gamemap[x][MAP_WIDTH / 2] = map_tile(True)
-        for y in range(MAP_WIDTH):
-            gamemap[MAP_HEIGHT / 2][y] = map_tile(True)
-
-    elif level == 5:
         for num in range(1, 10):
             #top left
             gamemap[num][0] = map_tile(True)
@@ -174,11 +143,57 @@ def define_map(level=0):
             gamemap[MAP_HEIGHT-1][MAP_WIDTH-num-1] = map_tile(True)
             gamemap[MAP_HEIGHT-num-1][MAP_WIDTH-1] = map_tile(True)
 
-    elif level == 6:
-        for num in range(0, MAP_WIDTH-1):
-            gamemap[MAP_HEIGHT-num-1][MAP_WIDTH-1-num] = map_tile(True)
+#full perimeter
+    elif level == 2:
+        for x in range(MAP_HEIGHT):
+            gamemap[x][0] = map_tile(True)
+            gamemap[x][MAP_WIDTH-1] = map_tile(True)
+        for y in range(MAP_WIDTH):
+            gamemap[0][y] = map_tile(True)
+            gamemap[MAP_HEIGHT-1][y] = map_tile(True)
 
-    elif level == 7:
+#corners and two lines in the middle
+    elif level == 3:
+        for num in range(1, 10):
+            #top left
+            gamemap[num][0] = map_tile(True)
+            gamemap[0][num] = map_tile(True)
+            #bottom left
+            gamemap[MAP_HEIGHT-1][num] = map_tile(True)
+            gamemap[MAP_HEIGHT-num-1][0] = map_tile(True)
+            #top right
+            gamemap[num][MAP_WIDTH-1] = map_tile(True)
+            gamemap[0][MAP_WIDTH-num-1] = map_tile(True)
+            #bottom left
+            gamemap[MAP_HEIGHT-1][MAP_WIDTH-num-1] = map_tile(True)
+            gamemap[MAP_HEIGHT-num-1][MAP_WIDTH-1] = map_tile(True)
+        for x in range(MAP_HEIGHT):
+            if x < MAP_HEIGHT - 7 > 7:
+                gamemap[x][MAP_WIDTH / 3] = map_tile(True)
+                gamemap[x][MAP_WIDTH - (MAP_WIDTH / 3)] = map_tile(True)
+
+#full perimeter and two lines
+    elif level == 4:
+        for x in range(MAP_HEIGHT):
+            gamemap[x][0] = map_tile(True)
+            gamemap[x][MAP_WIDTH-1] = map_tile(True)
+        for y in range(MAP_WIDTH):
+            gamemap[0][y] = map_tile(True)
+            gamemap[MAP_HEIGHT-1][y] = map_tile(True)
+        for x in range(MAP_HEIGHT):
+            if x < MAP_HEIGHT - 7 > 7:
+                gamemap[x][MAP_WIDTH / 3] = map_tile(True)
+                gamemap[x][MAP_WIDTH - MAP_WIDTH / 3] = map_tile(True)
+
+#cross
+    elif level == 5:
+        for x in range(MAP_HEIGHT):
+            gamemap[x][MAP_WIDTH / 2] = map_tile(True)
+        for y in range(MAP_WIDTH):
+            gamemap[MAP_HEIGHT / 2][y] = map_tile(True)
+
+#diagonal lines from corners, going inwards.
+    elif level == 6:
         for num in range(0, (MAP_HEIGHT/2)-5):
             #right side
             gamemap[0+num][MAP_WIDTH-1-num] = map_tile(True)
@@ -187,7 +202,8 @@ def define_map(level=0):
             gamemap[0+num][0+num] = map_tile(True)
             gamemap[MAP_HEIGHT-1-num][0+num] = map_tile(True)
 
-    elif level == 8:
+#diaonal lines from corners going inwards, with two bars in the middle.
+    elif level == 7:
         for num in range(0, (MAP_HEIGHT/2)-5):
             #right side
             gamemap[0+num][MAP_WIDTH-1-num] = map_tile(True)
@@ -199,6 +215,12 @@ def define_map(level=0):
             if x < MAP_HEIGHT - 7 > 7:
                 gamemap[x][MAP_WIDTH / 3 +4] = map_tile(True)
                 gamemap[x][MAP_WIDTH - (MAP_WIDTH / 3 +4 )] = map_tile(True)
+
+#stripes
+    elif level == 8:
+        for num in range(0, MAP_WIDTH):
+            gamemap[MAP_HEIGHT-num-1][MAP_WIDTH-1-num] = map_tile(True)
+            gamemap[MAP_HEIGHT-num-26][MAP_WIDTH-1-num] = map_tile(True)
 
 
 def handle_keys():
@@ -242,6 +264,9 @@ def handle_keys():
     elif libtcod.console_is_key_pressed(libtcod.KEY_KPADD) and status == 'newgame':
         obj = snake_parts(snake[0].x, snake[0].y, '#', 'body', libtcod.white, True)
         snake.append(obj)
+    elif libtcod.console_is_key_pressed(libtcod.KEY_KPSUB) and status == 'newgame':
+        obj = snake_parts(snake[0].x, snake[0].y, '#', 'body', libtcod.white, True)
+        del snake[-1]
     else:
         if status != 'dead':
             status = player_move_or_eat(oldX, oldY)
